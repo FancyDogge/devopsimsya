@@ -1,0 +1,197 @@
+# ===========================
+# Python (FastAPI / general)
+# ===========================
+# Bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+.envrc
+*.env
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller / Pytest / Coverage
+*.manifest
+*.spec
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# ===========================
+# Node.js
+# ===========================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment & config
+.env
+.env.local
+.env.*.local
+*.env
+
+# ===========================
+# Docker
+# ===========================
+# Docker Compose override files (local customizations)
+docker-compose.override.yml
+docker-compose.*.yml   # e.g. docker-compose.dev.yml, docker-compose.prod.yml
+
+# Temporary Docker build context leftovers
+docker-compose.local.yml
+
+# ===========================
+# Kubernetes
+# ===========================
+# Local kubeconfig files (never commit real ones)
+kubeconfig
+kubeconfig.*
+*.kubeconfig
+
+# Secrets / sensitive manifests
+*secret*.yaml
+*secret*.yml
+*secret*.json
+*.key
+*.pem
+*.crt
+
+# Helm (temporary charts, local overrides)
+charts/*.tgz
+helm.lock
+requirements.lock
+*.lock
+helmfile.lock
+
+# Kustomize temporary files
+.kustomize/
+
+# ===========================
+# IDEs & Editors
+# ===========================
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ / PyCharm / WebStorm
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-*
+.sublime/
+
+# Vim
+*.swp
+*.swo
+*~
+.*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+
+# ===========================
+# OS generated files
+# ===========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ===========================
+# Logs & databases
+# ===========================
+logs/
+*.log
+*.pid
+*.seed
+*.sqlite
+*.db
+
+# ===========================
+# Testing & coverage (Python/Node common)
+# ===========================
+.coverage
+.coverage.*
+.nyc_output/
+coverage/
+*.lcov
+junit.xml
+test-reports/
+
+# ===========================
+# Miscellaneous
+# ===========================
+# Local configuration overrides
+*.local
+*.override
+
+# Terraform (if used alongside)
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Ansible
+*.retry
+ansible.log
+
+# Environment variables file (global)
+.env.production
+.env.staging
+
+# CI/CD local test artifacts
+.gitlab-ci-local/
+.act/
