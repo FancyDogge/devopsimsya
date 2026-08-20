@@ -10,7 +10,7 @@ jobs:
 
     env:
       HOST: ${{ secrets.VPS_IP }}
-      USER: ${{ secrets.VPS_USER }}
+      USER: ${{ variables.VPS_USER }}
       SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     steps:
