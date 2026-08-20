@@ -1,0 +1,25 @@
+name: Install NGINX
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure the SSH Private Key Secret
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Add VPS IP To Known Hosts
+        run: ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+
+      - name: Install NGINX
+        run: |
+          export MY_HOST="${{ secrets.VPS_IP }}"
+          ssh ${{ secrets.VPS_USER }}@$MY_HOST "sudo apt update && sudo apt install nginx -y"
