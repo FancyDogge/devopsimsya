@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      HOST: ${{ secrets.VPS_HOST }}
+      HOST: ${{ secrets.VPS_IP }}
       USER: ${{ secrets.VPS_USER }}
       SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
