@@ -1,11 +1,13 @@
 name: Hello World
+
 on:
   workflow_dispatch:
   push:
+
 jobs:
   build:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - name: Hello World
-      run: echo "Hello World"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hello World
+        run: echo "Hello World"
