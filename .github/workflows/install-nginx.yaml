@@ -5,21 +5,27 @@ on:
   push:
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Configure the SSH Private Key Secret
+    env:
+      HOST: ${{ secrets.VPS_HOST }}
+      USER: ${{ secrets.VPS_USER }}
+      SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH Private Key
         run: |
           mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
 
-      - name: Add VPS IP To Known Hosts
-        run: ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+      - name: Add VPS Host to Known Hosts
+        run: |
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
 
       - name: Install NGINX
         run: |
-          export MY_HOST="${{ secrets.VPS_IP }}"
-          ssh ${{ secrets.VPS_USER }}@$MY_HOST "sudo apt update && sudo apt install nginx -y"
+          ssh -i ~/.ssh/id_ed25519 "$USER@$HOST" "sudo apt update && sudo apt install nginx -y"
