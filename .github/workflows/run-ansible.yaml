@@ -2,6 +2,7 @@ name: Run Ansible Playbooks
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   ansible-deploy:
