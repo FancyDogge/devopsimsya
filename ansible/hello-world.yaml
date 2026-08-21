@@ -1,0 +1,27 @@
+---
+- name: Hello World Playbook
+  hosts: vps
+  become: false # Для простого вывода и создания файлов root не нужен
+
+  tasks:
+    # 1. Вывод сообщения в консоль раннера (аналог echo)
+    - name: Print Hello World to console
+      ansible.builtin.debug:
+        msg: "Hello World from Ansible!"
+
+    # 2. Выполнение команды на удаленном VPS и сохранение результата
+    - name: Check whoami and uptime on remote server
+      ansible.builtin.command:
+        cmd: whoami
+      register: current_user # Сохраняем вывод команды в переменную
+
+    - name: Display remote user
+      ansible.builtin.debug:
+        msg: "Currently executing as: {{ current_user.stdout }}"
+
+    # 3. Создание файла с текстом на самом VPS
+    - name: Create hello-world file on VPS
+      ansible.builtin.copy:
+        content: "Hello World from GitHub Actions + Ansible!\n"
+        dest: /home/psina/hello.txt
+        mode: '0644'

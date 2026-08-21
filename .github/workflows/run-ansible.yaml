@@ -54,3 +54,8 @@ jobs:
       - name: Run Install NGINX Playbook
         working-directory: ./ansible
         run: ansible-playbook install-nginx.yaml
+      
+      # По приколу
+      - name: Run Hello World Playbook
+        working-directory: ./ansible
+        run: ansible-playbook hello-world.yaml
