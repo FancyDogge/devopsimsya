@@ -1,0 +1,55 @@
+name: Run Ansible Playbooks
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ansible-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      HOST: ${{ secrets.VPS_IP }}
+      SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      ANSIBLE_REMOTE_USER: ${{ variables.VPS_USER }}
+
+    steps:
+      # 1. Скачиваем репозиторий с ansible.cfg, плейбуками и кодом
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      # '3.x' указывает экшену автоматически найти и развернуть наивысшую стабильную 
+      # минорную версию Python 3, доступную в кэше раннеров GitHub
+      - name: Set up latest Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      # 2. Ставим Ansible на раннер GitHub
+      - name: Install Ansible
+        run: pip install ansible
+
+      # 3. Настраиваем SSH-клиент раннера
+      - name: Configure SSH Key and Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+
+      # 4. Подставляем реальный IP в инвентарь
+      - name: Generate Dynamic Inventory
+        working-directory: ./ansible
+        run: |
+          echo "[vps]" > inventory.ini
+          echo "my_vps ansible_host=$HOST" >> inventory.ini
+
+
+      # 5. Проверяем связь (эквивалент ping через SSH)
+      - name: Check Ansible Connectivity
+        working-directory: ./ansible
+        run: ansible vps -m ping
+
+      # 6. Запускаем плейбук
+      - name: Run Install NGINX Playbook
+        working-directory: ./ansible
+        run: ansible-playbook install-nginx.yaml
