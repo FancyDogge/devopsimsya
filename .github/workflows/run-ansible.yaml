@@ -10,7 +10,7 @@ jobs:
     env:
       HOST: ${{ secrets.VPS_IP }}
       SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      ANSIBLE_REMOTE_USER: ${{ variables.VPS_USER }}
+      ANSIBLE_REMOTE_USER: ${{ vars.VPS_USER }}
 
     steps:
       # 1. Скачиваем репозиторий с ansible.cfg, плейбуками и кодом
