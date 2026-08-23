@@ -42,7 +42,7 @@ jobs:
         working-directory: ./ansible
         run: |
           echo "[vps]" > inventory.ini
-          echo "my_vps ansible_host=$HOST" >> inventory.ini
+          echo "my_vps ansible_host=$HOST ansible_user=$ANSIBLE_REMOTE_USER">> inventory.ini
 
 
       # 5. Проверяем связь (эквивалент ping через SSH)
