@@ -5,7 +5,7 @@
 
   vars:
     # Динамически берет пользователя из параметров подключения SSH - vars.VPS_USER в GitHub
-    app_user: "{{ ANSIBLE_REMOTE_USER }}"
+    app_user: "{{ ansible_user }}"
     app_dir: "/home/{{ app_user }}/app/devopsimsya/py_app"
     venv_dir: "{{ app_dir }}/venv"
 
