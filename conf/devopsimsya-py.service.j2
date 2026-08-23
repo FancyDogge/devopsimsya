@@ -1,0 +1,28 @@
+{# 
+Этот файл — Systemd Unit. Он регистрирует приложение как полноценную 
+системную службу Linux (демон), которая управляется через команду systemctl
+#}
+
+[Unit]
+Description=Devopsimsya FastAPI app
+{# Указывает ядру Linux не пытаться запускать приложение до тех пор, 
+пока сетевой стек сервера полностью не инициализирован #}
+After=network.target
+
+[Service]
+{# запуск от непривилегированного пользователя (подставится имя из Ansible) #}
+User={{ app_user }}
+Group={{ app_user }}
+{# где лежит main.py #}
+WorkingDirectory={{ app_dir }}/src
+{# запуск Gunicorn из виртуального окружения #}
+ExecStart={{ venv_dir }}/bin/gunicorn --worker-class uvicorn.workers.UvicornWorker main:app --bind 127.0.0.1:8888
+{# автоматический перезапуск службы через 5 секунд в случае любого падения или сбоя #}
+Restart=always
+RestartSec=5
+{# мгновенная отправка логов print() / logging в journalctl без задержек в буфере Python #}
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+{# регистрация автозапуска при загрузке операционной системы. #}
+WantedBy=multi-user.target

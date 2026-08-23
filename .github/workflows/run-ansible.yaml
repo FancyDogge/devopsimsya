@@ -14,7 +14,7 @@ jobs:
       ANSIBLE_REMOTE_USER: ${{ vars.VPS_USER }}
 
     steps:
-      # 1. Скачиваем репозиторий с ansible.cfg, плейбуками и кодом
+      # 1. Скачиваем репозиторий с ansible.cfg, плейбуками и кодом на гитлаб машинку
       - name: Checkout Code
         uses: actions/checkout@v7
 
@@ -50,12 +50,7 @@ jobs:
         working-directory: ./ansible
         run: ansible vps -m ping
 
-      # 6. Запускаем плейбук
-      - name: Run Install NGINX Playbook
+      # 6 Деплоим py_app
+      - name: Deploy Python App
         working-directory: ./ansible
-        run: ansible-playbook install-nginx.yaml
-      
-      # По приколу
-      - name: Run Hello World Playbook
-        working-directory: ./ansible
-        run: ansible-playbook hello-world.yaml
+        run: ansible-playbook deploy-python.yaml
