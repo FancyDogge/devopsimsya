@@ -53,7 +53,7 @@
         dest: "{{ app_dir }}/src/"
         recursive: true # - аналог утилиты rsync с флагом -r (или частью флага -a). указывает сканировать всю файловую структуру вглубь
         delete: true # флаг --delete утилиты rsync. удаляет на сервере те файлы, которых больше нет в репозитории
-      become: false # lля synchronize директиву become необходимо принудительно отключить. 
+      become: false # для synchronize директиву become необходимо принудительно отключить. 
       #А то раннер ГитХаба попытается войти на сервак по SSH как рут, у которого нету ключей или прав на прямой логин
 
     # 4. Создание venv и установка зависимостей из requirements.txt
@@ -92,7 +92,6 @@
       #После того как systemd узнал о новой конфигурации, мы перезапускаем сам процесс приложения, чтобы он поднялся с новыми параметрами.
 
     # 6. Добавление конфигурации nginx и включение сайта через симлинк
-    # Чтобы активировать сайт, в sites-enabled/ создается символическая ссылка (ярлык) на файл из sites-available/
     - name: Copy nginx configuration
       ansible.builtin.copy:
         src: "{{ playbook_dir }}/../conf/devopsimsya-py.nginx"
@@ -104,6 +103,7 @@
 
     - name: Enable nginx site via symlink
       ansible.builtin.file:
+        # Чтобы активировать сайт, в sites-enabled/ создается символическая ссылка на файл из sites-available/
         src: /etc/nginx/sites-available/devopsimsya-py
         dest: /etc/nginx/sites-enabled/devopsimsya-py
         state: link

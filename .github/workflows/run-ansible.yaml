@@ -54,3 +54,8 @@ jobs:
       - name: Deploy Python App
         working-directory: ./ansible
         run: ansible-playbook deploy-python.yaml
+
+      # 7. Деплоим js_app
+      - name: Deploy Node.js App
+        working-directory: ./ansible
+        run: ansible-playbook deploy-js.yaml
