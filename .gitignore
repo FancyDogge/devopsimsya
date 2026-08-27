@@ -80,6 +80,9 @@ out/
 docker-compose.override.yml
 docker-compose.*.yml   # e.g. docker-compose.dev.yml, docker-compose.prod.yml
 
+# Убираем override файл компоуза
+compose.override.yaml
+
 # Temporary Docker build context leftovers
 docker-compose.local.yml
 

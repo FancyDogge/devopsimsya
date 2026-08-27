@@ -1,0 +1,10 @@
+services:
+  py_app:
+    build:
+      context: ./py_app
+      dockerfile: Dockerfile
+
+  js_app:
+    build:
+      context: ./js_app
+      dockerfile: Dockerfile
