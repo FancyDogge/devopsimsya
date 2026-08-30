@@ -2,9 +2,11 @@ name: Run Ansible Playbooks
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches: [ "main" ]
+    paths:
+      - "ansible/**"   # Срабатывает только при изменениях в папке ansible/ 
+      # Т.к. мы на docker стадии, а не bare metal, то чек в папке conf нам больше ненужен
 
 jobs:
   ansible-deploy:
@@ -52,12 +54,14 @@ jobs:
         working-directory: ./ansible
         run: ansible vps -m ping
 
-      # 6 Деплоим py_app
-      - name: Deploy Python App
+      # 6-new. качаем роль geerlingguy.docker на раннер гитхаб экшнс
+      - name: Install Ansible Galaxy Roles
         working-directory: ./ansible
-        run: ansible-playbook deploy-python.yaml
+        run: ansible-galaxy install -r requirements.yml
 
-      # 7. Деплоим js_app
-      - name: Deploy Node.js App
+      # 7-new. Устанавливаем docker engine на впску
+      - name: Setup Docker Engine on VPS
         working-directory: ./ansible
-        run: ansible-playbook deploy-js.yaml
+        run: ansible-playbook setup-docker.yaml
+
+      

@@ -1,0 +1,22 @@
+---
+- name: Setup Docker and Host Environment
+  hosts: all
+  become: true
+
+  vars:
+    #compose V2
+    docker_install_compose_plugin: true
+    #убирает на всякий устаревший compose (docker-compose)
+    docker_compose_package_state: absent
+    docker_service_state: started
+    docker_service_enabled: true
+
+  roles:
+    - role: geerlingguy.docker
+
+  tasks:
+    - name: Check project directory exists on VPS
+      ansible.builtin.file:
+        path: /opt/devopsimsya
+        state: directory
+        mode: '0755'
