@@ -6,7 +6,7 @@ on:
     branches: [ "main" ]
     paths:
       - "ansible/**"   # Срабатывает только при изменениях в папке ansible/ 
-      # Т.к. мы на docker стадии, а не bare metal, то чек в папке conf нам больше ненужен
+      # Т.к. мы на docker стадии, а не bare metal, то чек в папке conf нам больше ненужен.
 
 jobs:
   ansible-deploy:
