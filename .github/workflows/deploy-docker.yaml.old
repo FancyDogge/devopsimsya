@@ -1,10 +1,13 @@
 name: Docker - Build, Push & Deploy
 
 on:
-  workflow_run:
-    workflows: ["Run Ansible Playbooks"]
-    types: [completed]
-    branches: [main]
+  push:
+    branches: [ "main" ]
+    paths:
+      - "py_app/**"
+      - "js_app/**"
+      - "compose.yaml"
+      - "conf/**"
 
   workflow_dispatch:
 
