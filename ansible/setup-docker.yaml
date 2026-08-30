@@ -4,8 +4,8 @@
   become: true
 
   vars:
-    #compose V2
-    docker_install_compose_plugin: true
+    #compose V2, выставил ща в false, какой-то берд на vps происходит из-за того что уже был докер установлен
+    docker_install_compose_plugin: false
     #убирает на всякий устаревший compose (docker-compose)
     docker_compose_package_state: absent
     docker_service_state: started
@@ -30,6 +30,20 @@
     - role: geerlingguy.docker
 
   tasks:
+    # 1. Создаем стандартный системный каталог для CLI-плагинов Docker
+    - name: Ensure Docker CLI plugins directory exists
+      ansible.builtin.file:
+        path: /usr/local/lib/docker/cli-plugins
+        state: directory
+        mode: '0755'
+
+    # 2. Скачиваем официальный бинарник Docker Compose напрямую
+    - name: Download official Docker Compose CLI plugin
+      ansible.builtin.get_url:
+        url: "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-{{ ansible_architecture }}"
+        dest: /usr/local/lib/docker/cli-plugins/docker-compose
+        mode: '0755'
+
     - name: Ensure project directory exists with correct ownership
       # тупо вышло, под рутом пакпка создалась и по пермишн крашнулся деплой
       ansible.builtin.file:

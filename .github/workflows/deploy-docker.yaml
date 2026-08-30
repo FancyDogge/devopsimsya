@@ -64,7 +64,9 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: ${{ vars.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # set -e чтобы пайплайн строго проверял исполнение каждой команды и краснел
           script: |
+            set -e
             cd /opt/devopsimsya
             docker compose pull
             docker compose up -d --remove-orphans
