@@ -11,6 +11,21 @@
     docker_service_state: started
     docker_service_enabled: true
 
+  pre_tasks:
+    # сбрасываем ошибку failed state в systemd
+    - name: Reset systemd failed state for docker units
+      ansible.builtin.command: systemctl reset-failed docker.service docker.socket
+      failed_when: false
+      changed_when: false
+
+    # включаем и запускаем сокет до вызова роли (были проблемы с тачкой, из-за того что там докцкер уже 90 дней живет и не обновлялся
+    - name: Ensure docker.socket is running before service starts
+      ansible.builtin.systemd:
+        name: docker.socket
+        state: started
+        enabled: true
+      ignore_errors: true
+
   roles:
     - role: geerlingguy.docker
 
