@@ -30,8 +30,11 @@
     - role: geerlingguy.docker
 
   tasks:
-    - name: Check project directory exists on VPS
+    - name: Ensure project directory exists with correct ownership
+      # тупо вышло, под рутом пакпка создалась и по пермишн крашнулся деплой
       ansible.builtin.file:
         path: /opt/devopsimsya
         state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         mode: '0755'
