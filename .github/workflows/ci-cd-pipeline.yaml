@@ -1,5 +1,5 @@
 name: CI/CD Pipeline
-#Т. к. очередность выполнения сломана была, все в один файл пошло
+# Общий пайплайн, потому что косяк с очередностью запуска был: они одновременно стартовали
 
 on:
   push:
@@ -8,75 +8,102 @@ on:
 
 jobs:
   # Настройка хоста через Ansible
-  setup-host:
-    name: Setup Host via Ansible
+  ansible-setup:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-      - name: Set up SSH Key
+    env:
+      HOST: ${{ secrets.VPS_IP }}
+      SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      ANSIBLE_REMOTE_USER: ${{ vars.VPS_USER }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up latest Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Configure SSH Key and Known Hosts
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.VPS_IP }}" >> ~/.ssh/known_hosts
-
-      - name: Install Ansible and requirements
-        run: |
-          pipx install --include-deps ansible
-          ansible-galaxy install -r ansible/requirements.yaml
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
 
       - name: Generate Dynamic Inventory
+        working-directory: ./ansible
         run: |
-          echo "[vps]" > ansible/inventory.ini
-          echo "${{ secrets.VPS_IP }} ansible_user=${{ vars.VPS_USER }} ansible_ssh_private_key_file=~/.ssh/id_ed25519" >> ansible/inventory.ini
+          echo "[vps]" > inventory.ini
+          echo "my_vps ansible_host=$HOST ansible_user=$ANSIBLE_REMOTE_USER" >> inventory.ini
 
-      - name: Run Ansible Playbook
-        run: |
-          ansible-playbook -i ansible/inventory.ini ansible/setup-docker.yaml
+      - name: Check Ansible Connectivity
+        working-directory: ./ansible
+        run: ansible vps -m ping
 
-  # Сборка и деплой Docker 
-  build-and-deploy:
-    name: Build, Push & Deploy Docker
-    needs: [setup-host] # ждет успешного завершения Ansible джобы сверху
+      - name: Install Ansible Galaxy Roles
+        working-directory: ./ansible
+        run: ansible-galaxy install -r requirements.yml
+
+      - name: Setup Docker Engine on VPS
+        working-directory: ./ansible
+        run: ansible-playbook setup-docker.yaml
+
+  # Сборка и пуш Docker-образов
+  build-and-push:
+    needs: ansible-setup
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4.3.0
 
-      - name: Build and Push Python App
-        uses: docker/build-push-action@v6
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4.6.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Python App
+        uses: docker/build-push-action@v7.3.0
         with:
           context: ./py_app
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/devopsimsya-py:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/devopsimsya-py:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/devopsimsya-py:${{ github.sha }}
 
-      - name: Build and Push Node.js App
-        uses: docker/build-push-action@v6
+      - name: Build & Push Node.js App
+        uses: docker/build-push-action@v7.3.0
         with:
           context: ./js_app
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/devopsimsya-js:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/devopsimsya-js:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/devopsimsya-js:${{ github.sha }}
 
-      - name: Copy Compose and Configs to VPS
-        uses: appleboy/scp-action@v0.1.7
+  # Деплой контейнеров на VPS
+  docker-deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Copy Compose and Nginx configs to VPS
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ vars.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "compose.yaml,conf/nginx-gateway.conf"
           target: "/opt/devopsimsya"
-          strip_components: 0
 
       - name: Deploy containers on VPS
         uses: appleboy/ssh-action@v1.2.5
