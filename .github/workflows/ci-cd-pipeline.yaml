@@ -2,8 +2,8 @@ name: CI/CD Pipeline
 # Общий пайплайн, потому что косяк с очередностью запуска был: они одновременно стартовали
 
 on:
-  push:
-    branches: [ "main" ]
+  # push:
+  #   branches: [ "main" ]
   workflow_dispatch:
 
 jobs:

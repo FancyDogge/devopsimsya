@@ -1,0 +1,9 @@
+# apiVersion — это обязательное поле в манифестах Kubernetes, определяющее группу и версию API, к которой относится ресурс (Namespace, Pod, Service)
+apiVersion: v1
+
+# тип ресурса
+kind: Namespace
+
+metadata:
+  # Имя пространства имен - в дальнейшем все сервисы будут создаваться внутри него.
+  name: devopsimsya

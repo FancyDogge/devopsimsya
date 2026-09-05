@@ -1,0 +1,63 @@
+# управление контейнером Redis
+# для контроллеров развертывания (Deployment) используется API apps/v1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deploy
+  # Указываем, что ресурс принадлежит нашему пространству имен
+  namespace: devopsimsya
+  labels:
+    app: redis
+spec:
+  replicas: 1
+
+  # Селектор: сообщает Deployment, какими именно подами он управляет.
+  # Deployment ищет поды с меткой app: redis
+  selector:
+    matchLabels:
+      app: redis
+
+  # Шаблон, по которому K8s создает каждый под
+  template:
+    metadata:
+      # Метка на самом поде (обязана совпадать с matchLabels выше)
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          #официальный образ redis, как в докере
+          image: redis:alpine
+          ports:
+            # порт, который слушает процесс внутри контейнера
+            - containerPort: 6379
+          # ограничение ресурсов (сетап для VPS с 2гб оперативы от переполнения)
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+
+---
+# Service: Внутренняя сеть и DNS для redis
+apiVersion: v1
+kind: Service
+metadata:
+  # Имя сервиса станет его внутренним DNS-хостом: redis-svc
+  name: redis-svc
+  namespace: devopsimsya
+spec:
+  # ClusterIP делает порт доступным ТОЛЬКО внутри кластера (снаружи в redis никто не залезет)
+  type: ClusterIP
+
+  # этот Service отправляет входящие пакеты на все поды с меткой app: redis
+  selector:
+    app: redis
+
+  ports:
+    # порт, на который будут стучатся другие поды (py_app, js_app)
+    - port: 6379
+      # порт внутри контейнера redis, куда пересылается трафик
+      targetPort: 6379
